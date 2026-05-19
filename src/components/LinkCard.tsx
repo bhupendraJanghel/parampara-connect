@@ -5,16 +5,26 @@ import type { LinkItem } from '../types';
 interface LinkCardProps {
   link: LinkItem;
   index: number;
+  onLinkClick?: (id: string) => void;
 }
 
-const LinkCard = ({ link, index }: LinkCardProps) => {
+const LinkCard = ({ link, index, onLinkClick }: LinkCardProps) => {
   const Icon = link.icon;
+  const isModalTrigger = link.id === 'instagram' || link.id === 'whatsapp' || link.id === 'call';
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (isModalTrigger) {
+      e.preventDefault();
+      onLinkClick?.(link.id);
+    }
+  };
 
   return (
     <motion.a
       href={link.url}
-      target="_blank"
-      rel="noopener noreferrer"
+      target={isModalTrigger ? '_self' : '_blank'}
+      rel={isModalTrigger ? '' : 'noopener noreferrer'}
+      onClick={handleClick}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 * index + 0.4, duration: 0.5 }}
