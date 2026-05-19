@@ -1,17 +1,70 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { socialLinks } from '../data/links';
 
-const HangingString = ({ left, length, delay }: { left: string; length: number; delay: number }) => {
+const HangingString = ({ left, length, delay, tilt, time }: { left: string; length: number; delay: number; tilt: number; time: number }) => {
   const itemCount = Math.floor(length / 20);
+  const positionInt = parseInt(left) || 0;
+  
+  // Phase offset so strings swing out of sync
+  const phase = positionInt * 0.5;
+  // Idle swing for this specific string computed purely from time prop
+  const idleSwing = Math.sin(time * 1.5 + phase) * 1.2;
+  
+  // Total rotation of the top segment
+  const topRotation = tilt + idleSwing;
+
+  const renderBead = (i: number) => {
+    const type = i % 3; // 0: Big Gold Bead, 1: Small Gold Bead, 2: Crystal Diamond
+
+    if (type === 0) {
+      return (
+        <div
+          key={i}
+          className="w-2 h-2 rounded-full border border-black/10 shadow-sm shrink-0"
+          style={{
+            background: 'radial-gradient(circle at 35% 35%, #ffd24d 0%, #b38600 100%)',
+            marginTop: '8px'
+          }}
+        />
+      );
+    } else if (type === 1) {
+      return (
+        <div
+          key={i}
+          className="w-1.5 h-1.5 rounded-full border border-black/10 shadow-sm shrink-0"
+          style={{
+            background: 'radial-gradient(circle at 35% 35%, #fff2a3 0%, #997300 100%)',
+            marginTop: '6px'
+          }}
+        />
+      );
+    } else {
+      return (
+        <div
+          key={i}
+          className="w-2.5 h-2.5 rotate-45 border border-white/40 shadow-inner shrink-0"
+          style={{
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.2) 100%)',
+            backdropFilter: 'blur(2px)',
+            marginTop: '8px'
+          }}
+        />
+      );
+    }
+  };
+
+  const topCount = Math.floor(itemCount / 2);
+  const bottomCount = itemCount - topCount;
 
   return (
     <motion.div
       initial={{ y: -160, rotate: 0, opacity: 0 }}
-      animate={{ y: 0, rotate: [-1, 1, -1], opacity: 0.3 }}
+      animate={{ y: 0, rotate: topRotation, opacity: 0.3 }}
       transition={{
         y: { type: 'spring', stiffness: 85, damping: 14, delay },
         opacity: { duration: 0.8, delay },
-        rotate: { repeat: Infinity, duration: 4 + Math.random() * 2, ease: "easeInOut", delay: delay + 1.2 }
+        rotate: { type: 'spring', stiffness: 45, damping: 12 }
       }}
       whileHover={{
         rotate: [0, 22, -15, 10, -5, 0],
@@ -24,88 +77,174 @@ const HangingString = ({ left, length, delay }: { left: string; length: number; 
       style={{ transformOrigin: 'top center', left }}
       className="absolute top-0 z-20 w-6 flex flex-col items-center pointer-events-auto cursor-grab active:cursor-grabbing"
     >
-      {/* Thin Gold Chain */}
-      <div className="w-[1px] bg-gradient-to-b from-[#c39b56] via-[#c39b56]/40 to-[#c39b56]/10" style={{ height: `${length}px` }}></div>
-
-      {/* Golden Beads & Crystals */}
-      <div className="absolute top-0 flex flex-col items-center w-full" style={{ height: `${length}px` }}>
-        {Array.from({ length: itemCount }).map((_, i) => {
-          const type = i % 3; // 0: Big Gold Bead, 1: Small Gold Bead, 2: Crystal Diamond
-
-          if (type === 0) {
-            return (
-              <div
-                key={i}
-                className="w-2 h-2 rounded-full border border-black/10 shadow-sm"
-                style={{
-                  background: 'radial-gradient(circle at 35% 35%, #ffd24d 0%, #b38600 100%)',
-                  marginTop: '10px'
-                }}
-              />
-            );
-          } else if (type === 1) {
-            return (
-              <div
-                key={i}
-                className="w-1.5 h-1.5 rounded-full border border-black/10 shadow-sm"
-                style={{
-                  background: 'radial-gradient(circle at 35% 35%, #fff2a3 0%, #997300 100%)',
-                  marginTop: '8px'
-                }}
-              />
-            );
-          } else {
-            return (
-              <div
-                key={i}
-                className="w-2.5 h-2.5 rotate-45 border border-white/40 shadow-inner"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.2) 100%)',
-                  backdropFilter: 'blur(2px)',
-                  marginTop: '10px'
-                }}
-              />
-            );
-          }
-        })}
+      {/* Top Segment of the Chain */}
+      <div 
+        className="w-[1px] bg-gradient-to-b from-[#c39b56] to-[#c39b56]/60 flex flex-col items-center relative" 
+        style={{ height: `${length * 0.5}px` }}
+      >
+        <div className="absolute top-0 flex flex-col items-center w-full">
+          {Array.from({ length: topCount }).map((_, idx) => renderBead(idx))}
+        </div>
       </div>
 
-      {/* Hanging Royal Lotus Ornament / Pendant at the bottom */}
+      {/* Middle Segment of the Chain (Nested for organic bend/whip physics) */}
       <motion.div
-        className="relative z-30 flex flex-col items-center -mt-1"
-        whileHover={{ scale: 1.2 }}
+        animate={{ rotate: topRotation * 0.5 }}
+        transition={{ type: 'spring', stiffness: 30, damping: 9 }}
+        style={{ transformOrigin: 'top center', marginTop: '6px' }}
+        className="flex flex-col items-center w-full"
       >
-        {/* Connecting Gold Loop */}
-        <div className="w-1.5 h-1.5 border border-[#c39b56] rounded-full -mb-[2px]"></div>
-
-        {/* Diamond frame holding the crystal jewel */}
-        <div className="w-4 h-4 sm:w-4.5 sm:h-4.5 rotate-45 border border-[#c39b56] flex items-center justify-center bg-gradient-to-br from-[#241308] to-[#0a0a0a] shadow-lg relative overflow-hidden group">
-          {/* Inner shiny glow */}
-          <div className="absolute inset-0 bg-brand-gold/10 opacity-50 group-hover:opacity-100 transition-opacity"></div>
-
-          {/* Sparkly crystal center (looks like a glass jewel) */}
-          <div className="w-1.5 h-1.5 bg-white rounded-full -rotate-45 shadow-[0_0_8px_rgba(255,255,255,0.9)] animate-pulse"></div>
+        <div 
+          className="w-[1px] bg-gradient-to-b from-[#c39b56]/60 to-[#c39b56]/20 flex flex-col items-center relative" 
+          style={{ height: `${length * 0.5}px` }}
+        >
+          <div className="absolute top-0 flex flex-col items-center w-full">
+            {Array.from({ length: bottomCount }).map((_, idx) => renderBead(topCount + idx))}
+          </div>
         </div>
 
-        {/* Hanging Tassel */}
-        <div className="w-[1px] h-2.5 bg-[#c39b56] mt-[-1px]"></div>
-        <div className="w-1.5 h-1.5 bg-[#c39b56] rounded-full"></div>
+        {/* Bottom Pendant (Nested even deeper for cumulative swing / inertia) */}
+        <motion.div
+          animate={{ rotate: topRotation * 0.6 }}
+          transition={{ type: 'spring', stiffness: 20, damping: 6 }}
+          style={{ transformOrigin: 'top center', marginTop: '8px' }}
+          className="relative z-30 flex flex-col items-center"
+        >
+          {/* Connecting Gold Loop */}
+          <div className="w-1.5 h-1.5 border border-[#c39b56] rounded-full -mb-[2px]"></div>
+
+          {/* Diamond frame holding the crystal jewel */}
+          <div className="w-4 h-4 sm:w-4.5 sm:h-4.5 rotate-45 border border-[#c39b56] flex items-center justify-center bg-gradient-to-br from-[#241308] to-[#0a0a0a] shadow-lg relative overflow-hidden group">
+            {/* Inner shiny glow */}
+            <div className="absolute inset-0 bg-brand-gold/10 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+
+            {/* Sparkly crystal center */}
+            <div className="w-1.5 h-1.5 bg-white rounded-full -rotate-45 shadow-[0_0_8px_rgba(255,255,255,0.9)] animate-pulse"></div>
+          </div>
+
+          {/* Hanging Tassel */}
+          <div className="w-[1px] h-2.5 bg-[#c39b56] mt-[-1px]"></div>
+          <div className="w-1.5 h-1.5 bg-[#c39b56] rounded-full"></div>
+        </motion.div>
       </motion.div>
     </motion.div>
   );
 };
 
 const Header = ({ onSocialClick }: { onSocialClick?: (id: string) => void }) => {
+  const [swingState, setSwingState] = useState({ tilt: 0, time: 0 });
+
+  useEffect(() => {
+    let currentShake = 0;
+    let orientationTilt = 0;
+    let mouseTilt = 0;
+
+    // Handle tilt (orientation)
+    const handleOrientation = (e: DeviceOrientationEvent) => {
+      if (e.gamma !== null) {
+        // Map gamma (-45 to 45 deg) to rotation (-15 to 15 deg)
+        orientationTilt = Math.max(-15, Math.min(15, e.gamma / 3));
+      }
+    };
+
+    // Handle shake (motion acceleration)
+    let lastX = 0, lastY = 0, lastZ = 0;
+    let lastTime = 0;
+    const SHAKE_THRESHOLD = 12;
+
+    const handleMotion = (e: DeviceMotionEvent) => {
+      const acc = e.accelerationIncludingGravity;
+      if (!acc) return;
+
+      const currentTime = Date.now();
+      if ((currentTime - lastTime) > 80) {
+        const diffTime = currentTime - lastTime;
+        lastTime = currentTime;
+
+        const x = acc.x || 0;
+        const y = acc.y || 0;
+        const z = acc.z || 0;
+
+        const delta = Math.abs(x + y + z - lastX - lastY - lastZ);
+        const speed = (delta / diffTime) * 10000;
+
+        if (speed > SHAKE_THRESHOLD) {
+          const impulse = (Math.random() > 0.5 ? 1 : -1) * (15 + Math.random() * 15);
+          currentShake = impulse;
+        }
+
+        lastX = x;
+        lastY = y;
+        lastZ = z;
+      }
+    };
+
+    // Handle mouse movement for desktop
+    let lastMouseX = 0;
+    let lastMouseTime = 0;
+    const handleMouseMove = (e: MouseEvent) => {
+      const currentTime = Date.now();
+      if (lastMouseTime && (currentTime - lastMouseTime) > 50) {
+        const diffX = e.clientX - lastMouseX;
+        const speed = diffX / (currentTime - lastMouseTime);
+        if (Math.abs(speed) > 0.4) {
+          mouseTilt = Math.max(-10, Math.min(10, speed * 8));
+        }
+      }
+      lastMouseX = e.clientX;
+      lastMouseTime = currentTime;
+    };
+
+    // Animation frame update loop
+    let animationFrameId: number;
+    const updateLoop = () => {
+      const targetTilt = orientationTilt + currentShake + mouseTilt;
+      
+      // Interpolate and update time in a single state change to maintain React purity
+      setSwingState(prev => ({
+        tilt: prev.tilt + (targetTilt - prev.tilt) * 0.15,
+        time: Date.now() / 1000
+      }));
+
+      // Decay impulses
+      currentShake *= 0.95;
+      mouseTilt *= 0.92;
+
+      animationFrameId = requestAnimationFrame(updateLoop);
+    };
+
+    animationFrameId = requestAnimationFrame(updateLoop);
+
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientation', handleOrientation);
+    }
+    if (window.DeviceMotionEvent) {
+      window.addEventListener('devicemotion', handleMotion);
+    }
+    window.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      if (window.DeviceOrientationEvent) {
+        window.removeEventListener('deviceorientation', handleOrientation);
+      }
+      if (window.DeviceMotionEvent) {
+        window.removeEventListener('devicemotion', handleMotion);
+      }
+      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
   return (
     <div className="relative flex flex-col items-center pt-8 pb-8 px-4 overflow-hidden rounded-b-[40px] bg-gradient-to-b from-[#140b05] to-[#0a0a0a] shadow-[0_15px_50px_rgba(0,0,0,0.7)] border-b border-brand-gold/20">
       {/* Hanging Traditional Marigold & Bell Garlands */}
       <div className="absolute inset-0 pointer-events-none z-20">
-        <HangingString left="6%" length={110} delay={0.1} />
-        <HangingString left="20%" length={140} delay={0.25} />
-        <HangingString left="34%" length={90} delay={0.15} />
-        <HangingString left="66%" length={90} delay={0.2} />
-        <HangingString left="80%" length={140} delay={0.3} />
-        <HangingString left="94%" length={110} delay={0.18} />
+        <HangingString left="6%" length={110} delay={0.1} tilt={swingState.tilt} time={swingState.time} />
+        <HangingString left="20%" length={140} delay={0.25} tilt={swingState.tilt} time={swingState.time} />
+        <HangingString left="34%" length={90} delay={0.15} tilt={swingState.tilt} time={swingState.time} />
+        <HangingString left="66%" length={90} delay={0.2} tilt={swingState.tilt} time={swingState.time} />
+        <HangingString left="80%" length={140} delay={0.3} tilt={swingState.tilt} time={swingState.time} />
+        <HangingString left="94%" length={110} delay={0.18} tilt={swingState.tilt} time={swingState.time} />
       </div>
 
       {/* Luxurious ambient background glow */}
