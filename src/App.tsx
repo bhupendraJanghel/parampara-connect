@@ -56,7 +56,7 @@ function App() {
   const currentModal = activeModal ? modalConfigs[activeModal] : null;
 
   return (
-    <div className="min-h-screen relative pb-16 bg-brand-bg overflow-x-hidden">
+    <div className="min-h-screen relative pb-[calc(4.5rem+env(safe-area-inset-bottom))] bg-brand-bg overflow-x-hidden pt-[env(safe-area-inset-top)]">
       {/* Seamless Festive Decor & Confetti background pattern overlay */}
       <div 
         className="absolute inset-0 opacity-[0.045] pointer-events-none z-0" 
