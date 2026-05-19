@@ -17,9 +17,9 @@ const Footer = () => {
 
       {/* Thank you message */}
       <motion.p
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.8 }}
         className="font-serif italic text-brand-gold text-xs tracking-widest uppercase"
       >
         Thank you for visiting
