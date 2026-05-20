@@ -5,6 +5,7 @@ import LinkCard from './components/LinkCard';
 import Footer from './components/Footer';
 import BottomBar from './components/BottomBar';
 import SelectionModal from './components/SelectionModal';
+import IOSInstallPrompt from './components/IOSInstallPrompt';
 import { links } from './data/links';
 import { APP_URLS } from './config/constants';
 import { FaInstagram, FaWhatsapp } from 'react-icons/fa';
@@ -87,6 +88,7 @@ function App() {
       </div>
 
       <BottomBar />
+      <IOSInstallPrompt />
 
       <AnimatePresence>
         {showToast && (

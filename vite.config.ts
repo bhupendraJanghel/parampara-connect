@@ -12,8 +12,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'maskable-icon.png', 'festive-pattern.png', 'parampara-logo.png'],
       manifest: {
-        name: 'The Parampara Events',
-        short_name: 'Parampara',
+        name: 'Parampara Connect',
+        short_name: 'Parampara Connect',
         description: 'Luxury Wedding & Event Planner Link Hub',
         theme_color: '#140b05',
         background_color: '#140b05',
