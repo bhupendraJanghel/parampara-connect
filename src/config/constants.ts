@@ -14,4 +14,5 @@ export const APP_URLS = {
   FACEBOOK: 'https://www.facebook.com/profile.php?id=61566655755699',
   YOUTUBE: 'https://youtube.com/paramparaevents',
   EMAIL: 'mailto:paramparadecorevents@gmail.com',
+  ONLINE_STORE: 'https://parampara-decor-shop.vercel.app/',
 } as const;
