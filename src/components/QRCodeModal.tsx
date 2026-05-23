@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiX, FiDownload } from 'react-icons/fi';
 import { FaWhatsapp, FaQrcode } from 'react-icons/fa';
@@ -8,16 +9,39 @@ interface QRCodeModalProps {
 }
 
 export default function QRCodeModal({ isOpen, onClose }: QRCodeModalProps) {
-  const qrCodePath = '/qr-code.png'; // Path where the user will store their QR code in the public folder
+  const qrCodePath = '/parampara-connect-qr.png'; // Path where the user will store their QR code in the public folder
   const shareUrl = "https://parampara-connect.vercel.app/";
+  const fallbackUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(shareUrl);
 
-  const handleDownload = () => {
-    const link = document.createElement('a');
-    link.href = qrCodePath;
-    link.download = 'parampara-connect-qr.png';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const [imgSrc, setImgSrc] = useState(qrCodePath);
+
+  // Reset to local path when modal opens to re-attempt loading if added
+  useEffect(() => {
+    if (isOpen) {
+      setImgSrc(qrCodePath);
+    }
+  }, [isOpen]);
+
+  const handleDownload = async () => {
+    try {
+      const response = await fetch(imgSrc);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = 'parampara-connect-qr.png';
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error('Failed to download QR code', error);
+      // Fallback: Open in new window so user can save/download manually
+      window.open(imgSrc, '_blank');
+    }
   };
 
   const handleShareWhatsApp = () => {
@@ -67,12 +91,11 @@ export default function QRCodeModal({ isOpen, onClose }: QRCodeModalProps) {
             {/* QR Code Container */}
             <div className="p-3 bg-white rounded-xl border border-brand-gold/30 max-w-[200px] aspect-square w-full flex items-center justify-center">
               <img
-                src={qrCodePath}
+                src={imgSrc}
                 alt="Profile QR Code"
                 className="w-full h-full object-contain"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(shareUrl);
+                onError={() => {
+                  setImgSrc(fallbackUrl);
                 }}
               />
             </div>

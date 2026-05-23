@@ -50,7 +50,7 @@ function App() {
     sketches: {
       options: [
         { label: 'Call for Sketches', sublabel: 'Discuss custom sketch ideas', url: APP_URLS.PHONE_DECOR, icon: FiPhone },
-        { label: 'Instagram Sketches', sublabel: 'View sketches on Instagram', url: APP_URLS.INSTAGRAM, icon: FaInstagram },
+        { label: 'Instagram Sketches', sublabel: 'View sketches on Instagram', url: APP_URLS.CUSTOM_SKETCHES, icon: FaInstagram },
       ]
     }
   };
