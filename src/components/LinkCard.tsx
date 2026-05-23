@@ -10,7 +10,7 @@ interface LinkCardProps {
 
 const LinkCard = ({ link, index, onLinkClick }: LinkCardProps) => {
   const Icon = link.icon;
-  const isModalTrigger = link.id === 'instagram' || link.id === 'whatsapp' || link.id === 'call';
+  const isModalTrigger = link.id === 'instagram' || link.id === 'whatsapp' || link.id === 'call' || link.id === 'sketches';
 
   const handleClick = (e: React.MouseEvent) => {
     if (isModalTrigger) {

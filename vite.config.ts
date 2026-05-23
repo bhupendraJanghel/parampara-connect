@@ -9,7 +9,7 @@ export default defineConfig({
     react(), 
     tailwindcss(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'maskable-icon.png', 'festive-pattern.png', 'parampara-logo.png'],
       manifest: {
         name: 'Parampara Connect',
